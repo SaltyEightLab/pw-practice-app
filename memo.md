@@ -12,9 +12,8 @@ Section 5: UI Components
     ダイアログをテストの一環として受け入れるために、
     page.on("dialog", (dialog) => dialog.accept()) を行う必要がある。
 
-Playwright: Web Automation Testing From Zero to Hero
-Section 5: UI Components 39. Web Tables (Part 1)
-【Playwright でテーブル操作のテスト】
+39. Web Tables (Part 1)
+    【Playwright でテーブル操作のテスト】
 
 ✅ テーブルから特定の行を見つけて編集
 
@@ -29,3 +28,18 @@ Section 5: UI Components 39. Web Tables (Part 1)
 - タイムアウト設定を忘れずに！
 
 #Playwright #テスト自動化 #フロントエンド
+
+Playwright: Web Automation Testing From Zero to Hero
+Section 5: UI Components 41. Date Picker (Part 1)
+
+【カレンダーによる日付取得のテスト】
+
+await page
+.locator('[class="day-cell ng-star-inserted"]')
+.getByText("1", { exact: true })
+.click();
+
+のように、{ exact: true } を指定することで、"1", "10", "11", "12" などの候補から
+"1" を指定することができる。
+
+#Playwright #テスト自動化 #フロントエンド #e2e #駆け出しエンジニアと繋がりたい #エンジニア転職
