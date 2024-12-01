@@ -270,3 +270,41 @@ test("datepecker2", async ({ page }) => {
 
   await expect(calendarInputField).toHaveValue(dateToAssert);
 });
+
+test("slider", async ({ page }) => {
+  const tempGauge = page.locator(
+    "[tabtitle='Temperature'] ngx-temperature-dragger circle"
+  );
+  await tempGauge.evaluate((node) => {
+    node.setAttribute("cx", "232.630");
+    node.setAttribute("cy", "232.630");
+  });
+  await tempGauge.click();
+});
+
+test("slider2", async ({ page }) => {
+  //マウス操作
+  //対象のUI要素を取得
+  const tempBox = page.locator(
+    "[tabtitle='Temperature'] ngx-temperature-dragger"
+  );
+  //必要な場合のみ対象のUI要素をブラウザの表示領域にスクロール
+  await tempBox.scrollIntoViewIfNeeded();
+  //対象UI要素の領域の座標を取得
+  const box = await tempBox.boundingBox();
+  //対象UI要素の開始点 + 半分 で対象UI要素の中心座標を取得
+  const centerX = box.x + box.width / 2;
+  const centerY = box.y + box.height / 2;
+  //マウスを対象UI要素の中心座標に移動
+  await page.mouse.move(centerX, centerY);
+  //マウスを押下
+  await page.mouse.down();
+  //マウスを移動
+  await page.mouse.move(centerX + 100, centerY);
+  await page.mouse.move(centerX + 100, centerY + 100);
+  //マウスを離す
+  await page.mouse.up();
+
+  //tempBoxには30と表示されているはず。
+  expect(tempBox).toContainText("30");
+});
