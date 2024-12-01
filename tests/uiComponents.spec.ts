@@ -199,3 +199,74 @@ test("datepicker", async ({ page }) => {
     .click();
   await expect(calendarInputField).toHaveValue("Nov 1, 2024");
 });
+
+test("datepicker2", async ({ page }) => {
+  await page.getByText("Forms").click();
+  await page.getByText("Datepicker").click();
+
+  const calendarInputField = page.getByPlaceholder("Form Picker");
+  await calendarInputField.click();
+  await page
+    .locator(
+      "[class='appearance-ghost size-medium shape-rectangle icon-end status-basic nb-transition']"
+    )
+    .click();
+
+  let date = new Date();
+  date.setDate(date.getDate() + 1);
+  const expecteDate = date.getDate().toString();
+  const expectedMonthShort = date.toLocaleString("En-US", { month: "short" });
+  const expectedYear = date.getFullYear();
+  const dateToAssert = `${expectedMonthShort} ${expecteDate}, ${expectedYear}`;
+
+  await page
+    .locator("[class='ng-star-inserted']")
+    .getByText(expectedYear.toString())
+    .click();
+  await page
+    .locator("nb-calendar-month-picker")
+    .getByText(expectedMonthShort)
+    .click();
+  await page
+    .locator("[class='day-cell ng-star-inserted']")
+    .getByText(expecteDate, { exact: true })
+    .click();
+
+  await expect(calendarInputField).toHaveValue(dateToAssert);
+});
+
+test("datepecker2", async ({ page }) => {
+  await page.getByText("Forms").click();
+  await page.getByText("Datepicker").click();
+
+  const calendarInputField = page.getByPlaceholder("Form Picker");
+  await calendarInputField.click();
+
+  let date = new Date();
+  date.setDate(date.getDate() + 100);
+  const expecteDate = date.getDate().toString();
+  const expectedMonthShort = date.toLocaleString("En-US", { month: "short" });
+  const expectexMonthLong = date.toLocaleString("En-US", { month: "long" });
+  const expectedYear = date.getFullYear();
+  const dateToAssert = `${expectedMonthShort} ${expecteDate}, ${expectedYear}`;
+
+  let calendarMonthAndYear = await page
+    .locator("nb-calendar-view-mode")
+    .textContent();
+  const expectedMonthAndYear = ` ${expectexMonthLong} ${expectedYear}`;
+  while (!calendarMonthAndYear.includes(expectedMonthAndYear)) {
+    await page
+      .locator("nb-calendar-pageable-navigation [data-name='chevron-right']")
+      .click();
+    calendarMonthAndYear = await page
+      .locator("nb-calendar-view-mode")
+      .textContent();
+  }
+
+  await page
+    .locator("[class='day-cell ng-star-inserted']")
+    .getByText(expecteDate, { exact: true })
+    .click();
+
+  await expect(calendarInputField).toHaveValue(dateToAssert);
+});
