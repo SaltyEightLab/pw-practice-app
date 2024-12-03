@@ -49,7 +49,6 @@ Section 5: UI Components 42. Date Picker (Part 2)
 テスト実行日 + 100 日後に日付を DatePicker 上から拾って照合するテスト。
 これまでは動画教材の通りに写経して理解するだけだったけど、少しずつ動画教材がやろうとしていることを自分なりに予測し、コードに落とし込み、動画教材で答え合わせという順序で進めることができるようになってきたので成長を感じる！
 
-Playwright: Web Automation Testing From Zero to Hero
 Section 5: UI Components 43. Sliders
 図のようなスライダーを操作するテスト。
 まずは、
@@ -71,3 +70,35 @@ evaluate((node) => {})というメソッドが初めて出てきたので、？�
 また、node という引数は UI 要素「tempGauge」の DOM であり、これを渡すことによって、DOM を編集することができるようになる。
 
 ということらしい。
+
+45. What Is Page Objects
+
+Page Object Model についてさわりだけ学習しました！
+
+Page Object Model とは
+ページごとに、そのページのテストに必要なメソッドをまとめたオブジェクトを作成してテストを行なっていく手法のこと。
+これを行うことで、
+DRY: Don't Repeat Yourself
+KISS: Keep It Simple and Stupid
+のメリットを享受することができる。
+
+Playwright: Web Automation Testing From Zero to Hero
+Section 6: Page Objects Model 47. Navigation Page Object
+UI にアニメーションが含まれている場合、
+テストコードの処理がアニメーションの終了を待たずに処理されるため、
+本来通りの結果が得られないことがある。
+例えば、以下のような例だ。
+
+① サイドメニュー項目「プロフィール」をクリック
+② アニメーションを伴ってサイドメニュー項目が展開される。
+③ プロフィール項目内の「編集」をクリック
+④ 編集ページに遷移
+
+上記のような場合、② のアニメーションの終了を待たないと、③ のクリックは成功しない。
+よって、② の終了を待機する必要がある。
+
+推奨される対策:
+waitForSelector を使用して要素の状態変化を待機
+アニメーション完了を示す CSS クラスの付与を待機
+テスト環境では可能な限りアニメーションを無効化
+data-testid 属性を使用して、アニメーション状態に依存しない要素の特定
