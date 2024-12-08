@@ -146,3 +146,21 @@ css セレクターを用いて html 要素を検索する際、
 <div class="day-cell">
   <div class="ng-star-inserted">...</div>
 </div>
+
+const test = base.extend<TestFixtures>({
+//baseURL として http://localhost:3000 を設定する。
+baseURL: ['http://localhost:3000', { option: true }],
+//page というフィクスチャを作成する。引数は baseURL と page と use 関数
+page: async ({ baseURL, page }, use) => {
+//page が baseURL へアクセスする。これがテストの準備として行われる。
+await page.goto(baseURL);
+//page が use 関数によって処理される。これがテストの最後に行われる。
+await use(page);
+}
+});
+
+Section 6: Page Object Model 完了！！
+Page Object Model とは、テスト自動化のデザインパターンです。
+
+例えば、家の冷蔵庫が新しくなったとしても、冷蔵庫の中身の位置が変わったとしても、家族に「牛乳とって」と言われたら牛乳を取り、渡すことができます。
+これは、冷蔵庫から牛乳を摂るという処理の裏に、冷蔵庫の仕組みや中身の配置が隠蔽されているからです。
