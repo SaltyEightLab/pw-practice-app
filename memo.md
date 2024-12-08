@@ -120,3 +120,29 @@ KISS: Keep It Simple and Stupid（シンプルでわかりやすいコードを�
 よって、チームのメンバーや後の開発を考えた場合、
 DRY or KISS ?
 どちらを優先するべきなのかを考える必要がある。
+
+49. Parametrized Methods
+
+    async submitUsingTheGrigdWithCredentialsAndSelectOption(){
+
+    }
+    メソッドに分かりやすい名前をつけることを恐れないでください。
+
+css セレクターを用いて html 要素を検索する際、
+'.day-cell.ng-star-inserted' と '.day-cell .ng-star-inserted' は全く異なる意味を持つ。
+
+'.day-cell.ng-star-inserted'
+・半角スペースなし
+・同じ要素が両方のクラスを持つことを意味する
+・以下のような要素にマッチする
+
+<div class="day-cell ng-star-inserted">...</div>
+
+'.day-cell .ng-star-inserted'
+・半角スペースあり
+・.day-cell クラスを持つ要素の子孫要素の中で.ng-star-inserted クラスを持つものを指す
+・以下のような要素にマッチする
+
+<div class="day-cell">
+  <div class="ng-star-inserted">...</div>
+</div>
