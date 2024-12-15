@@ -162,5 +162,174 @@ await use(page);
 Section 6: Page Object Model 完了！！
 Page Object Model とは、テスト自動化のデザインパターンです。
 
-例えば、家の冷蔵庫が新しくなったとしても、冷蔵庫の中身の位置が変わったとしても、家族に「牛乳とって」と言われたら牛乳を取り、渡すことができます。
-これは、冷蔵庫から牛乳を摂るという処理の裏に、冷蔵庫の仕組みや中身の配置が隠蔽されているからです。
+# screenshot と video の自動保存機能について
+
+playwright では screenshot と video の自動保存機能がある。
+
+# screenshot の自動保存機能
+
+以下の様に記述することで、テスト実行時に screenshot が自動保存される。
+
+```tsx
+// ページ全体のスクリーンショットを保存
+await page.screenshot({ path: 'screenshots/datepicker.png' });
+
+const calendarInputField = page.getByPlaceholder('Form Picker');
+await calendarInputField.click();
+// calendarInputField のスクリーンショットを保存
+await calendarInputField.screenshot({ path: 'screenshots/calendarInputField.png' });
+
+// screenshot をバイナリデータとして取得
+const buffer = await page.screenshot();
+console.log(buffer.toString('base64'));
+/* 長い長い文字列が出力される。screenshot をバイナリデータとして取得することで、
+   1. 画像データをテキストとして扱える
+   2. データベースへの保存が容易
+   3. APIでの送受信が可能
+   4. HTMLのimg要素のsrc属性で直接表示可能
+  */
+```
+
+# video の自動保存機能
+
+playwright.config.ts の use の中で video: 'on' を設定することで、テスト実行時に video が自動保存される。
+なお、test-results/UsePageObjects-parametrized-methods-chromium/video.webm のような形で保存される。
+
+```tsx
+  use: {
+    trace: 'on-first-retry',
+    // 以下を追記
+    video: 'on',
+  },
+```
+
+# Playwright の環境変数設定方法
+
+Playwright において環境変数を設定するには以下の方法があります。
+
+## 1. playwright.config.ts の use で baseURL を設定
+
+playwright.config.ts の use の中で baseURL を設定することで、テスト実行時に baseURL が自動設定されます。
+つまり、`await page.goto("/");`で`http://localhost:4200/`にアクセスすることができます。
+
+```typescript
+use: {
+  baseURL: 'http://localhost:4200',
+},
+```
+
+なお、playwright.config.ts の projects ごとに設定することもできます。
+
+```typescript
+projects: [
+  {
+    name: 'dev',
+    use: {
+      ...devices['Desktop Chrome'],
+      baseURL: 'http://localhost:4200',
+    },
+  },
+  {
+    name: 'staging',
+    use: {
+      ...devices['Desktop Chrome'],
+      baseURL: 'http://localhost:4300',
+    },
+  },
+  {
+    name: 'production',
+    use: {
+      ...devices['Desktop Chrome'],
+      baseURL: 'http://localhost:4400',
+    },
+  },
+],
+```
+
+## 2. テストオプションの拡張
+
+baseURL とは別に、globalsQaURL など、他の URL を環境変数として設定したい場合、以下の手順で行うことができます。
+
+### 手順
+
+1. test-options.ts を作成する
+
+```typescript
+import { test as base } from '@playwright/test';
+
+export type TestOptions = {
+  globalsQaURL: string;
+};
+
+export const test = base.extend<TestOptions>({
+  globalsQaURL: [
+    '',
+    {
+      option: true,
+    },
+  ],
+});
+```
+
+2. playwright.config.ts の設定
+
+```typescript
+export default defineConfig<TestOptions>({
+  use: {
+    baseURL: 'http://localhost:4200',
+    globalsQaURL: 'https://www.globalsqa.com/demo-site/draganddrop/',
+  },
+});
+```
+
+3. テストファイルでの使用
+
+```typescript
+import { expect } from '@playwright/test';
+import { test } from '../test-options';
+
+test('drag and drop with iFrame case1', async ({ page, globalsQaURL }) => {
+  await page.goto(globalsQaURL);
+  // テストコードを記述
+});
+```
+
+## 3. process.env を用いた環境変数の設定
+
+.env ファイルを用いて、process.env で環境変数を設定することができます。
+
+### 手順
+
+1. .env ファイルの作成
+
+```plaintext
+URL=https://www.globalsqa.com/demo-site/draganddrop/
+```
+
+2. dotenv のインストール
+
+```bash
+npm install dotenv --save-dev
+```
+
+3. playwright.config.ts の設定
+
+```typescript
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+```
+
+4. テストファイルでの使用
+
+```typescript
+test.beforeEach(async ({ page }) => {
+  await page.goto(process.env.URL);
+});
+```
+
+コマンドラインで process.env に環境変数を設定することもできます：
+
+```bash
+URL=https://www.globalsqa.com/demo-site/draganddrop/ npx playwright test autoWaiting.spec.ts --project=chromium
+```

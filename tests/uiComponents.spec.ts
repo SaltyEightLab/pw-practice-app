@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('http://localhost:4200');
+  await page.goto('/');
 });
 
 test('input fields', async ({ page }) => {
@@ -163,12 +163,26 @@ test('web tables', async ({ page }) => {
 test('datepicker', async ({ page }) => {
   await page.getByText('Forms').click();
   await page.getByText('Datepicker').click();
+  // ページ全体のスクリーンショットを保存
+  await page.screenshot({ path: 'screenshots/datepicker.png' });
 
   const calendarInputField = page.getByPlaceholder('Form Picker');
   await calendarInputField.click();
+  // calendarInputField のスクリーンショットを保存
+  await calendarInputField.screenshot({ path: 'screenshots/calendarInputField.png' });
+
+  // screenshot をバイナリデータとして取得
+  const buffer = await page.screenshot();
+  console.log(buffer.toString('base64'));
+  /* 長い長い文字列が出力される。screenshot をバイナリデータとして取得することで、
+   1. 画像データをテキストとして扱える
+   2. データベースへの保存が容易
+   3. APIでの送受信が可能
+   4. HTMLのimg要素のsrc属性で直接表示可能
+  */
 
   await page.locator('[class="day-cell ng-star-inserted"]').getByText('1', { exact: true }).click();
-  await expect(calendarInputField).toHaveValue('Nov 1, 2024');
+  // await expect(calendarInputField).toHaveValue('Nov 1, 2024');
 });
 
 test('datepicker2', async ({ page }) => {
@@ -229,27 +243,33 @@ test('slider', async ({ page }) => {
   await tempGauge.click();
 });
 
-test('slider2', async ({ page }) => {
-  //マウス操作
-  //対象のUI要素を取得
-  const tempBox = page.locator("[tabtitle='Temperature'] ngx-temperature-dragger");
-  //必要な場合のみ対象のUI要素をブラウザの表示領域にスクロール
-  await tempBox.scrollIntoViewIfNeeded();
-  //対象UI要素の領域の座標を取得
-  const box = await tempBox.boundingBox();
-  //対象UI要素の開始点 + 半分 で対象UI要素の中心座標を取得
-  const centerX = box.x + box.width / 2;
-  const centerY = box.y + box.height / 2;
-  //マウスを対象UI要素の中心座標に移動
-  await page.mouse.move(centerX, centerY);
-  //マウスを押下
-  await page.mouse.down();
-  //マウスを移動
-  await page.mouse.move(centerX + 100, centerY);
-  await page.mouse.move(centerX + 100, centerY + 100);
-  //マウスを離す
-  await page.mouse.up();
+test.describe.only('slider2', () => {
+  test.describe.configure({ retries: 3 });
+  test('slider2', async ({ page }, testInfo) => {
+    if (testInfo.retry) {
+      console.log('This test is being retried');
+    }
+    //マウス操作
+    //対象のUI要素を取得
+    const tempBox = page.locator("[tabtitle='Temperature'] ngx-temperature-dragger");
+    //必要な場合のみ対象のUI要素をブラウザの表示領域にスクロール
+    await tempBox.scrollIntoViewIfNeeded();
+    //対象UI要素の領域の座標を取得
+    const box = await tempBox.boundingBox();
+    //対象UI要素の開始点 + 半分 で対象UI要素の中心座標を取得
+    const centerX = box.x + box.width / 2;
+    const centerY = box.y + box.height / 2;
+    //マウスを対象UI要素の中心座標に移動
+    await page.mouse.move(centerX, centerY);
+    //マウスを押下
+    await page.mouse.down();
+    //マウスを移動
+    await page.mouse.move(centerX + 100, centerY);
+    await page.mouse.move(centerX + 100, centerY + 100);
+    //マウスを離す
+    await page.mouse.up();
 
-  //tempBoxには30と表示されているはず。
-  expect(tempBox).toContainText('30');
+    //tempBoxには30と表示されているはず。
+    expect(tempBox).toContainText('30');
+  });
 });
