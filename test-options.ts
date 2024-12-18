@@ -1,17 +1,25 @@
-// playwrightのtestをbaseという名前でimport
 import { test as base } from '@playwright/test';
+import { PageManager } from './page-objects/pageManager';
 
-// TestOptions という基本の設定に付け加えたい設定を定義する。
+// フィクスチャとして他のテストで使用したいものの型を定義します。
 export type TestOptions = {
   globalsQaURL: string;
+  formLayoutsPage: string;
+  pageManager: PageManager;
 };
 
-// base という基本の設定に、TestOptions を付け加え、testオブジェクトとする。
+//
 export const test = base.extend<TestOptions>({
-  globalsQaURL: [
-    '',
-    {
-      option: true,
-    },
-  ],
+  globalsQaURL: ['', { option: true }],
+  formLayoutsPage: async ({ page }, use) => {
+    await page.goto('/');
+    await page.getByText('Forms').click();
+    await page.getByText('Form Layouts').click();
+    await use('');
+  },
+
+  pageManager: async ({ page }, use) => {
+    const pm = new PageManager(page);
+    await use(pm);
+  },
 });
