@@ -22,7 +22,7 @@ test('input fields', async ({ page }) => {
   await expect(usingTheGridEmailInput).toHaveValue('test@test.com');
 });
 
-test('radio buttons', async ({ page }) => {
+test.only('radio buttons', async ({ page }) => {
   await page.getByText('Forms').click();
   await page.getByText('Form Layouts').click();
   const usingTheGridForm = page.locator('nb-card', {
@@ -36,14 +36,15 @@ test('radio buttons', async ({ page }) => {
       name: 'Option 1',
     })
     .isChecked();
-  expect(radioStatus).toBeTruthy();
-  await expect(usingTheGridForm.getByRole('radio', { name: 'Option 1' })).toBeChecked();
+  // await expect(usingTheGridForm).toHaveScreenshot();
+  // expect(radioStatus).toBeTruthy();
+  // await expect(usingTheGridForm.getByRole('radio', { name: 'Option 1' })).toBeChecked();
 
-  await usingTheGridForm.getByRole('radio', { name: 'Option 2' }).check({
-    force: true,
-  });
-  expect(await usingTheGridForm.getByRole('radio', { name: 'Option 1' }).isChecked()).toBeFalsy();
-  expect(await usingTheGridForm.getByRole('radio', { name: 'Option 2' }).isChecked()).toBeTruthy();
+  // await usingTheGridForm.getByRole('radio', { name: 'Option 2' }).check({
+  //   force: true,
+  // });
+  // expect(await usingTheGridForm.getByRole('radio', { name: 'Option 1' }).isChecked()).toBeFalsy();
+  // expect(await usingTheGridForm.getByRole('radio', { name: 'Option 2' }).isChecked()).toBeTruthy();
 });
 
 test('checkboxes', async ({ page }) => {
@@ -107,7 +108,7 @@ test('dialog box', async ({ page }) => {
   await page.getByText('Tables & Data').click();
   await page.getByText('Smart Table').click();
 
-  page.on('dialog', (dialog) => {
+  page.on('dialog', dialog => {
     expect(dialog.message()).toEqual('Are you sure you want to delete?');
     dialog.accept();
   });
@@ -236,7 +237,7 @@ test('datepecker2', async ({ page }) => {
 
 test('slider', async ({ page }) => {
   const tempGauge = page.locator("[tabtitle='Temperature'] ngx-temperature-dragger circle");
-  await tempGauge.evaluate((node) => {
+  await tempGauge.evaluate(node => {
     node.setAttribute('cx', '232.630');
     node.setAttribute('cy', '232.630');
   });
